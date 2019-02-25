@@ -1,0 +1,43 @@
+dist: bionic
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      env: TARGET=server-mingw32 RELEASE=server/rdp2tcp.exe MINGW=i686-w64-mingw32-gcc
+      addons:
+        apt:
+          packages:
+          - mingw-w64
+    - os: linux
+      sudo: required
+      compiler: gcc
+      env: TARGET=client RELEASE=client/rdp2tcp DIST=bionic
+    - os: linux
+      dist: xenial
+      sudo: required
+      compiler: gcc
+      env: TARGET=client RELEASE=client/rdp2tcp DIST=xenial
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env: TARGET=client RELEASE=client/rdp2tcp
+
+language: c
+    
+script: 
+    - make $TARGET
+    - if [[ "$TARGET" == "client" ]]; then strip ${RELEASE} ; mv ${RELEASE} ${RELEASE}-${TRAVIS_OS_NAME}-${TRAVIS_DIST}-${CC_FOR_BUILD}; fi
+    - ls -l ${RELEASE}*
+
+deploy:
+  provider: releases
+  api_key:
+    secure: MzWPwxDbETB6533uXkYMd2t5f3yPwsgGYVgptj7LRKmVBqMyMTP/p5vtjS4uW4U5LTq6dC4e7kxjHUZBUTtf/No11AOKcMMLFcX2UZOcyWXWGyK1X8Kv/LUwjWm9WcXTuZYWfY12ts9yfOOT+hXJyJY+g717C1QWYyLdVBSuHn04ipG8KWjlDIZtck6o2xGN9EZ3cKlGrya2Wa1IPMrP7oumuH7QWySXArGvh0Rg02FWlbWDLlmhGayv6fn2yZOG0sLWntW46RJ8Csy4lRiMuragWiJk6qXyFN0/6btj3eU+/QkKYRxifFaTHxWQS8fAU0SErR/IbR5kSdA1IOpIlz9fX48om1nzEPrFNnPhK/vC3H2Ml9b83KyyBEcyNyFpGCyrkUbeDBuFNvwlb5uogeItOPZzIOm5W7aNd4lK5MtUJ5PT9+2JxrYFeSFtFv6fSfnoZkGqprg/T1fN+CEiCe4Whi6yqlpitFpHhsk01BrvvidlDhHzNWbaQPtDZbKWOi7JQTTCUlMZNnq69+LyUZsO3cZIK1z+SLY18MxfYTE8T4cY5c76/KyT5kJz5bm5lQ8UQBBW4ntM9rfxrmxhq25XdHQ57ljGNnJSui+p9/I+xVDwLng05JFT4lRt8eX00fpjiT8aWBo0LLM6VmigAuWHKSU8kXCIEaJct9zI3Co=
+  file_glob: true
+  file: ${RELEASE}*
+  skip_cleanup: true
+  overwrite: true
+  on:
+    repo: Sec42/rdp2tcp
+    tags: true
+

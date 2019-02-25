@@ -1,5 +1,5 @@
 BIN=rdp2tcp.exe
-CC=i586-mingw32msvc-gcc
+CC=$(MINGW)
 CFLAGS=-Wall -g \
 		 -D_WIN32_WINNT=0x0501 -DDEBUG \
 		 -I../common
